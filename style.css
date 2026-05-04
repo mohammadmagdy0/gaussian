@@ -1,0 +1,413 @@
+/* Gaussian Pro 2026 - Global Styles */
+:root {
+    --primary: #6366f1;
+    --success: #10b981;
+    --bg: #0f172a;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-main: #e2e8f0;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* نمط وضع النهار (Light Mode) */
+body.light-mode {
+    --bg: #f1f5f9;
+    --text-main: #1e293b;
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --card-bg: #ffffff;
+}
+
+body.light-mode .glass-bg {
+    background: radial-gradient(circle at 50% 50%, #cbd5e1 0%, #f1f5f9 100%);
+}
+
+body.light-mode .member {
+    background: rgba(0,0,0,0.03);
+}
+
+body.light-mode .step-card, 
+body.light-mode .input-card, 
+body.light-mode .team-card {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+body { 
+    font-family: 'Montserrat', 'Cairo', sans-serif; 
+    background: var(--bg); 
+    color: var(--text-main); 
+    min-height: 100vh; 
+    padding: 20px; 
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* Background Effect */
+.glass-bg { 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    z-index: -1; 
+    background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 100%); 
+}
+
+.app-container { 
+    width: 95%; 
+    max-width: 1100px; 
+    margin: auto; 
+    position: relative;
+}
+
+/* --- [تعديل التثبيت] Fixed Top Actions --- */
+/* --- Fixed Top Actions (تعديل الألوان للظهور بوضوح) --- */
+.top-actions {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px;
+    z-index: 10000;
+    direction: ltr !important;
+}
+
+[dir="rtl"] .top-actions {
+    right: 20px !important;
+    left: auto !important;
+}
+
+.top-actions .btn-icon {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    width: 55px; /* زيادة العرض قليلاً لتناسب النص */
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* تعديل خصائص القائمة المنسدلة للغة لتكون واضحة */
+.lang-dropdown {
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1); /* خلفية خفيفة جداً لتمييز النص */
+    border: none;
+    color: var(--text-main) !important; /* إجبار اللون على الظهور */
+    outline: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* تغيير لون النص في وضع النهار */
+body.light-mode .lang-dropdown {
+    color: #1e293b !important;
+}
+
+/* جعل الخيارات داخل القائمة قابلة للقراءة */
+.lang-dropdown option {
+    background: #1e293b;
+    color: white;
+}
+
+body.light-mode .lang-dropdown option {
+    background: white;
+    color: #1e293b;
+}
+
+.top-actions .btn-icon:hover {
+    background: var(--primary);
+    color: white !important;
+    transform: translateY(-3px);
+}
+
+.top-actions .btn-icon:hover .lang-dropdown {
+    color: white !important;
+}
+
+/* ضمان عدم تحرك الحاوية عند تغيير لغة الصفحة الأصلية */
+[dir="rtl"] .top-actions {
+    right: 20px !important;
+    left: auto !important;
+    flex-direction: row !important;
+}
+
+.top-actions .btn-icon {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    width: auto;
+    min-width: 45px;
+    height: 45px;
+    padding: 0 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lang-dropdown {
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.85rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    outline: none;
+}
+
+.top-actions .btn-icon:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Header Section */
+.hero-header { text-align: center; margin: 40px 0; }
+.hero-header h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1px; }
+.hero-header span { color: var(--primary); }
+.badge { 
+    background: var(--primary); 
+    padding: 5px 12px; 
+    border-radius: 20px; 
+    font-size: 0.75rem; 
+    margin-bottom: 10px; 
+    display: inline-block;
+    font-weight: 700;
+}
+
+/* Control Panel Grid */
+.control-panel { 
+    display: grid; 
+    grid-template-columns: 1.6fr 1fr; 
+    gap: 20px; 
+    margin-bottom: 30px; 
+}
+
+@media (max-width: 768px) {
+    .control-panel { grid-template-columns: 1fr; }
+}
+
+.input-card, .team-card { 
+    background: var(--glass); 
+    padding: 25px; 
+    border-radius: 20px; 
+    border: 1px solid var(--glass-border); 
+    backdrop-filter: blur(10px); 
+}
+
+/* Inputs & Buttons */
+.input-row { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-group small { color: var(--primary); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; }
+
+input[type="number"] {
+    background: white; border: none; padding: 12px; border-radius: 8px;
+    width: 75px; font-weight: 700; text-align: center; font-size: 1rem; color: #1e293b;
+}
+
+.btn-main { 
+    background: var(--primary); color: white; border: none; height: 48px; 
+    padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.3s; 
+}
+.btn-icon { 
+    background: white; border: none; min-width: 48px; height: 48px; 
+    border-radius: 10px; cursor: pointer; color: var(--primary); 
+    display: flex; align-items: center; justify-content: center; transition: 0.3s; 
+}
+
+/* Team List Styling */
+.team-header { display: flex; align-items: center; gap: 10px; color: var(--primary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; }
+.team-members { display: flex; flex-direction: column; gap: 10px; }
+.member { 
+    background: rgba(255,255,255,0.03); padding: 10px 15px; border-radius: 12px; 
+    border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 12px; transition: 0.3s; 
+}
+.member:hover { transform: translateX(8px); background: rgba(99, 102, 241, 0.1); border-color: var(--primary); }
+.member-role { font-size: 0.6rem; background: var(--primary); padding: 2px 8px; border-radius: 5px; font-weight: 800; }
+.member p { font-size: 0.9rem; font-weight: 600; margin: 0; }
+
+/* Matrix Display */
+.matrix-wrapper { padding: 20px; overflow-x: auto; display: flex; flex-direction: column; align-items: center; }
+.matrix-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+
+.matrix-row input { 
+    width: 65px !important; 
+    height: 45px !important; 
+    border: 2px solid var(--glass-border); 
+    background: var(--input-bg) !important;
+    color: #1e293b !important; 
+    text-align: center !important; 
+    font-weight: 700;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.matrix-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #ffffff !important;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.v-line { width: 3px; height: 35px; background: var(--primary); margin: 0 10px; border-radius: 5px; opacity: 0.6; }
+
+.btn-solve { 
+    background: var(--success); color: white; border: none; padding: 15px 40px; 
+    border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; transition: 0.3s; 
+}
+
+/* Solution Steps */
+.step-card { background: var(--glass); border-radius: 20px; padding: 25px; margin-top: 25px; border: 1px solid var(--glass-border); }
+.step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
+.notation-badge { font-family: 'JetBrains Mono'; background: var(--primary); padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; }
+.explanation-box { background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; border-left: 4px solid var(--success); margin-bottom: 20px; }
+
+/* AI Chatbot System */
+#ai-chat-toggle { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; z-index: 2000; box-shadow: 0 5px 20px rgba(99,102,241,0.4); }
+#ai-chat-container { 
+    position: fixed; bottom: 100px; right: 25px; width: 350px; height: 480px; 
+    background: #1e293b; border-radius: 20px; z-index: 2000; display: flex; 
+    flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid var(--glass-border); transition: 0.3s; 
+}
+.ai-chat-closed { transform: translateY(20px); opacity: 0; pointer-events: none; }
+#ai-chat-header { padding: 15px 20px; background: var(--primary); border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; font-weight: 700; }
+#ai-chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #1e293b; }
+#ai-chat-footer { padding: 10px; display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 0 0 20px 20px; }
+#ai-chat-footer input { flex: 1; background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
+
+.ai-msg, .user-msg { 
+    max-width: 90%; padding: 12px; border-radius: 12px; font-size: 0.9rem; 
+    line-height: 1.5; word-wrap: break-word; 
+}
+.ai-msg { background: #334155; color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+.user-msg { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+/* Utilities */
+.pivot { background: #fbbf24 !important; color: #000 !important; font-weight: 900 !important; }
+.hidden { display: none; }
+.pivot-active {
+    animation: pulse-glow 1.5s infinite;
+    border: 2px solid #fbbf24 !important;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.4); }
+    50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.7); }
+    100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.4); }
+}
+@media (max-width: 850px) {
+    .step-content {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.explanation-box strong {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+/* --- التنسيق النهائي للأيقونات مع الأعلام --- */
+.top-actions {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px;
+    z-index: 10000;
+    direction: ltr !important; /* لضمان بقاء الترتيب ثابت دائماً */
+}
+
+.top-actions .btn-icon {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    width: 80px; /* زيادة العرض قليلاً ليستوعب العلم والحروف */
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.lang-dropdown {
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.9rem;
+    background: transparent;
+    border: none;
+    color: var(--text-main) !important; /* اللون الأساسي للنص والعلم */
+    outline: none;
+    width: 100%;
+    height: 100%;
+    appearance: none; /* إخفاء سهم المتصفح */
+    -webkit-appearance: none;
+    padding: 0 5px;
+    letter-spacing: 0.5px;
+}
+
+/* تحسين شكل القائمة المنسدلة عند النقر */
+.lang-dropdown option {
+    background: #1e293b; /* خلفية داكنة للخيارات */
+    color: #ffffff;
+    font-weight: 600;
+}
+
+body.light-mode .lang-dropdown option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* تأثير التمرير (Hover) */
+.top-actions .btn-icon:hover {
+    background: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.top-actions .btn-icon:hover .lang-dropdown {
+    color: #ffffff !important; /* ضمان بقاء النص أبيض عند التمرير */
+}
+
+/* دعم الهواتف */
+@media (max-width: 600px) {
+    .top-actions {
+        top: 10px !important;
+        right: 10px !important;
+        gap: 8px;
+    }
+    .top-actions .btn-icon {
+        width: 70px;
+        height: 45px;
+    }
+}
