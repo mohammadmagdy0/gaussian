@@ -143,45 +143,82 @@ function fillRandom() {
 // --- Gaussian Solver ---
 // --- Gaussian Solver ---
 function solve() {
+
     let matrix = [];
+
     for (let i = 0; i < currentRows; i++) {
+
         matrix[i] = [];
+
         for (let j = 0; j <= currentCols; j++) {
+
             const el = document.getElementById(`m-${i}-${j}`);
-            if (!el || isNaN(parseFloat(el.value))) return alert(translations[currentLang].alert_fill);
+
+            if (!el || isNaN(parseFloat(el.value))) {
+                return alert(translations[currentLang].alert_fill);
+            }
+
             matrix[i][j] = parseFloat(el.value);
         }
     }
 
     const container = document.getElementById('steps-container');
-    container.innerHTML = `<h2 style="margin:40px 0; text-align:center; color:var(--primary);">${translations[currentLang].step_title}</h2>`;
+
+    container.innerHTML = `
+        <h2 style="
+            margin:40px 0;
+            text-align:center;
+            color:var(--primary);
+        ">
+            ${translations[currentLang].step_title}
+        </h2>
+    `;
 
     let workingMatrix = JSON.parse(JSON.stringify(matrix));
 
+    // =========================
     // Forward Elimination
+    // =========================
     for (let i = 0; i < Math.min(currentRows, currentCols); i++) {
 
         // Pivoting
         let maxRow = i;
+
         for (let k = i + 1; k < currentRows; k++) {
-            if (Math.abs(workingMatrix[k][i]) > Math.abs(workingMatrix[maxRow][i])) {
+
+            if (
+                Math.abs(workingMatrix[k][i]) >
+                Math.abs(workingMatrix[maxRow][i])
+            ) {
                 maxRow = k;
             }
         }
 
+        // Swap rows
         if (maxRow !== i) {
-            [workingMatrix[i], workingMatrix[maxRow]] = [workingMatrix[maxRow], workingMatrix[i]];
+
+            let temp = workingMatrix[i];
+            workingMatrix[i] = workingMatrix[maxRow];
+            workingMatrix[maxRow] = temp;
         }
 
-        if (Math.abs(workingMatrix[i][i]) < 0.000001) continue;
+        // Skip if pivot is zero
+        if (Math.abs(workingMatrix[i][i]) < 0.000001) {
+            continue;
+        }
 
         for (let k = i + 1; k < currentRows; k++) {
 
-            const factor = workingMatrix[k][i] / workingMatrix[i][i];
-            const notation = `R${k+1} = R${k+1} - (${factor.toFixed(2)})R${i+1}`;
+            const factor =
+                workingMatrix[k][i] / workingMatrix[i][i];
+
+            const notation =
+                `R${k+1} = R${k+1} - (${factor.toFixed(2)})R${i+1}`;
 
             for (let j = i; j <= currentCols; j++) {
-                workingMatrix[k][j] -= factor * workingMatrix[i][j];
+
+                workingMatrix[k][j] -=
+                    factor * workingMatrix[i][j];
             }
 
             renderStep(
@@ -192,6 +229,221 @@ function solve() {
         }
     }
 
+    // =========================
+    // Detect System Type
+    // =========================
+    let rank = 0;
+    let inconsistent = false;
+
+    for (let i = 0; i < currentRows; i++) {
+
+        let allZero = true;
+
+        for (let j = 0; j < currentCols; j++) {
+
+            if (Math.abs(workingMatrix[i][j]) > 0.000001) {
+
+                allZero = false;
+                break;
+            }
+        }
+
+        // [0 0 0 | non-zero]
+        if (
+            allZero &&
+            Math.abs(workingMatrix[i][currentCols]) > 0.000001
+        ) {
+            inconsistent = true;
+            break;
+        }
+
+        if (!allZero) {
+            rank++;
+        }
+    }
+
+    let solutionType = "";
+    let hasUniqueSolution = false;
+
+    if (inconsistent) {
+
+        solutionType =
+            currentLang === 'ar'
+            ? "لا يوجد حل"
+            : "No Solution";
+    }
+
+    else if (rank < currentCols) {
+
+        solutionType =
+            currentLang === 'ar'
+            ? "عدد لا نهائي من الحلول"
+            : "Infinite Solutions";
+    }
+
+    else {
+
+        solutionType =
+            currentLang === 'ar'
+            ? "حل وحيد"
+            : "Unique Solution";
+
+        hasUniqueSolution = true;
+    }
+
+    // =========================
+    // Back Substitution
+    // =========================
+    const results = new Array(currentCols).fill(0);
+
+    if (hasUniqueSolution) {
+
+        for (let i = currentCols - 1; i >= 0; i--) {
+
+            let sum = 0;
+
+            for (let j = i + 1; j < currentCols; j++) {
+
+                sum +=
+                    workingMatrix[i][j] * results[j];
+            }
+
+            results[i] =
+                (workingMatrix[i][currentCols] - sum)
+                / workingMatrix[i][i];
+        }
+    }
+
+    renderFinalResults(
+        results,
+        solutionType,
+        hasUniqueSolution
+    );
+}
+
+function renderFinalResults(
+    results,
+    solutionType,
+    hasUniqueSolution
+) {
+
+    const container =
+        document.getElementById('steps-container');
+
+    const resDiv =
+        document.createElement('div');
+
+    resDiv.className = 'step-card';
+
+    resDiv.style.borderTop =
+        "4px solid var(--success)";
+
+    let html = `
+        <div class="step-header">
+
+            <h3>
+                ${translations[currentLang].final_sol}
+            </h3>
+
+            <div class="badge"
+                 style="
+                    background:var(--success);
+                    font-size:14px;
+                 ">
+                 ${solutionType}
+            </div>
+
+        </div>
+    `;
+
+    // =========================
+    // Unique Solution
+    // =========================
+    if (hasUniqueSolution) {
+
+        html += `
+            <div style="
+                display:flex;
+                gap:15px;
+                flex-wrap:wrap;
+                justify-content:center;
+                padding:20px;
+            ">
+        `;
+
+        results.forEach((val, i) => {
+
+            html += `
+                <div class="btn-main"
+                     style="
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        min-width:140px;
+                     ">
+                    X${i+1} = ${val.toFixed(4)}
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    // =========================
+    // Infinite Solutions
+    // =========================
+    else if (
+        solutionType === "Infinite Solutions" ||
+        solutionType === "عدد لا نهائي من الحلول"
+    ) {
+
+        html += `
+            <div style="
+                padding:30px;
+                text-align:center;
+                font-size:20px;
+                line-height:2;
+                font-weight:600;
+            ">
+                ${
+                    currentLang === 'ar'
+                    ? "النظام يحتوي على حلول غير منتهية."
+                    : "The system has infinitely many solutions."
+                }
+            </div>
+        `;
+    }
+
+    // =========================
+    // No Solution
+    // =========================
+    else {
+
+        html += `
+            <div style="
+                padding:30px;
+                text-align:center;
+                font-size:20px;
+                line-height:2;
+                font-weight:600;
+            ">
+                ${
+                    currentLang === 'ar'
+                    ? "النظام غير متسق ولا يحتوي على حل."
+                    : "The system is inconsistent and has no solution."
+                }
+            </div>
+        `;
+    }
+
+    resDiv.innerHTML = html;
+
+    container.appendChild(resDiv);
+
+    resDiv.scrollIntoView({
+        behavior: 'smooth'
+    });
+}
     // Determine system type
     let rank = 0;
     let inconsistent = false;
