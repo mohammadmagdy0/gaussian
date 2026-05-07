@@ -141,426 +141,65 @@ function fillRandom() {
 }
 
 // --- Gaussian Solver ---
-// --- Gaussian Solver ---
 function solve() {
-
     let matrix = [];
-
     for (let i = 0; i < currentRows; i++) {
-
         matrix[i] = [];
-
         for (let j = 0; j <= currentCols; j++) {
-
             const el = document.getElementById(`m-${i}-${j}`);
-
-            if (!el || isNaN(parseFloat(el.value))) {
-                return alert(translations[currentLang].alert_fill);
-            }
-
+            if (!el || isNaN(parseFloat(el.value))) return alert(translations[currentLang].alert_fill);
             matrix[i][j] = parseFloat(el.value);
         }
     }
 
     const container = document.getElementById('steps-container');
-
-    container.innerHTML = `
-        <h2 style="
-            margin:40px 0;
-            text-align:center;
-            color:var(--primary);
-        ">
-            ${translations[currentLang].step_title}
-        </h2>
-    `;
+    container.innerHTML = `<h2 style="margin:40px 0; text-align:center; color:var(--primary);">${translations[currentLang].step_title}</h2>`;
 
     let workingMatrix = JSON.parse(JSON.stringify(matrix));
 
-    // =========================
-    // Forward Elimination
-    // =========================
     for (let i = 0; i < Math.min(currentRows, currentCols); i++) {
-
-        // Pivoting
-        let maxRow = i;
-
+        if (Math.abs(workingMatrix[i][i]) < 0.000001) continue;
         for (let k = i + 1; k < currentRows; k++) {
-
-            if (
-                Math.abs(workingMatrix[k][i]) >
-                Math.abs(workingMatrix[maxRow][i])
-            ) {
-                maxRow = k;
-            }
-        }
-
-        // Swap rows
-        if (maxRow !== i) {
-
-            let temp = workingMatrix[i];
-            workingMatrix[i] = workingMatrix[maxRow];
-            workingMatrix[maxRow] = temp;
-        }
-
-        // Skip if pivot is zero
-        if (Math.abs(workingMatrix[i][i]) < 0.000001) {
-            continue;
-        }
-
-        for (let k = i + 1; k < currentRows; k++) {
-
-            const factor =
-                workingMatrix[k][i] / workingMatrix[i][i];
-
-            const notation =
-                `R${k+1} = R${k+1} - (${factor.toFixed(2)})R${i+1}`;
-
+            const factor = workingMatrix[k][i] / workingMatrix[i][i];
+            const notation = `R${k+1} = R${k+1} - (${factor.toFixed(2)})R${i+1}`;
             for (let j = i; j <= currentCols; j++) {
-
-                workingMatrix[k][j] -=
-                    factor * workingMatrix[i][j];
+                workingMatrix[k][j] -= factor * workingMatrix[i][j];
             }
-
-            renderStep(
-                JSON.parse(JSON.stringify(workingMatrix)),
-                `${translations[currentLang].elim_col} ${i+1}`,
-                notation
-            );
+            renderStep(workingMatrix, `${translations[currentLang].elim_col} ${i+1}`, notation);
         }
     }
 
-    // =========================
-    // Detect System Type
-    // =========================
-    let rank = 0;
-    let inconsistent = false;
-
-    for (let i = 0; i < currentRows; i++) {
-
-        let allZero = true;
-
-        for (let j = 0; j < currentCols; j++) {
-
-            if (Math.abs(workingMatrix[i][j]) > 0.000001) {
-
-                allZero = false;
-                break;
-            }
-        }
-
-        // [0 0 0 | non-zero]
-        if (
-            allZero &&
-            Math.abs(workingMatrix[i][currentCols]) > 0.000001
-        ) {
-            inconsistent = true;
-            break;
-        }
-
-        if (!allZero) {
-            rank++;
-        }
-    }
-
-    let solutionType = "";
-    let hasUniqueSolution = false;
-
-    if (inconsistent) {
-
-        solutionType =
-            currentLang === 'ar'
-            ? "لا يوجد حل"
-            : "No Solution";
-    }
-
-    else if (rank < currentCols) {
-
-        solutionType =
-            currentLang === 'ar'
-            ? "عدد لا نهائي من الحلول"
-            : "Infinite Solutions";
-    }
-
-    else {
-
-        solutionType =
-            currentLang === 'ar'
-            ? "حل وحيد"
-            : "Unique Solution";
-
-        hasUniqueSolution = true;
-    }
-
-    // =========================
-    // Back Substitution
-    // =========================
     const results = new Array(currentCols).fill(0);
-
-    if (hasUniqueSolution) {
-
-        for (let i = currentCols - 1; i >= 0; i--) {
-
-            let sum = 0;
-
-            for (let j = i + 1; j < currentCols; j++) {
-
-                sum +=
-                    workingMatrix[i][j] * results[j];
-            }
-
-            results[i] =
-                (workingMatrix[i][currentCols] - sum)
-                / workingMatrix[i][i];
+    for (let i = Math.min(currentRows, currentCols) - 1; i >= 0; i--) {
+        let sum = 0;
+        for (let j = i + 1; j < currentCols; j++) sum += workingMatrix[i][j] * results[j];
+        if (Math.abs(workingMatrix[i][i]) > 0.000001) {
+            results[i] = (workingMatrix[i][currentCols] - sum) / workingMatrix[i][i];
         }
     }
-
-    renderFinalResults(
-        results,
-        solutionType,
-        hasUniqueSolution
-    );
+    renderFinalResults(results);
 }
 
-function renderFinalResults(
-    results,
-    solutionType,
-    hasUniqueSolution
-) {
-
-    const container =
-        document.getElementById('steps-container');
-
-    const resDiv =
-        document.createElement('div');
-
-    resDiv.className = 'step-card';
-
-    resDiv.style.borderTop =
-        "4px solid var(--success)";
-
-    let html = `
-        <div class="step-header">
-
-            <h3>
-                ${translations[currentLang].final_sol}
-            </h3>
-
-            <div class="badge"
-                 style="
-                    background:var(--success);
-                    font-size:14px;
-                 ">
-                 ${solutionType}
-            </div>
-
-        </div>
-    `;
-
-    // =========================
-    // Unique Solution
-    // =========================
-    if (hasUniqueSolution) {
-
-        html += `
-            <div style="
-                display:flex;
-                gap:15px;
-                flex-wrap:wrap;
-                justify-content:center;
-                padding:20px;
-            ">
-        `;
-
-        results.forEach((val, i) => {
-
-            html += `
-                <div class="btn-main"
-                     style="
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        min-width:140px;
-                     ">
-                    X${i+1} = ${val.toFixed(4)}
-                </div>
-            `;
-        });
-
-        html += `</div>`;
-    }
-
-    // =========================
-    // Infinite Solutions
-    // =========================
-    else if (
-        solutionType === "Infinite Solutions" ||
-        solutionType === "عدد لا نهائي من الحلول"
-    ) {
-
-        html += `
-            <div style="
-                padding:30px;
-                text-align:center;
-                font-size:20px;
-                line-height:2;
-                font-weight:600;
-            ">
-                ${
-                    currentLang === 'ar'
-                    ? "النظام يحتوي على حلول غير منتهية."
-                    : "The system has infinitely many solutions."
-                }
-            </div>
-        `;
-    }
-
-    // =========================
-    // No Solution
-    // =========================
-    else {
-
-        html += `
-            <div style="
-                padding:30px;
-                text-align:center;
-                font-size:20px;
-                line-height:2;
-                font-weight:600;
-            ">
-                ${
-                    currentLang === 'ar'
-                    ? "النظام غير متسق ولا يحتوي على حل."
-                    : "The system is inconsistent and has no solution."
-                }
-            </div>
-        `;
-    }
-
-    resDiv.innerHTML = html;
-
-    container.appendChild(resDiv);
-
-    resDiv.scrollIntoView({
-        behavior: 'smooth'
-    });
-}
-    // Determine system type
-    let rank = 0;
-    let inconsistent = false;
-
-    for (let i = 0; i < currentRows; i++) {
-
-        let allZero = true;
-
-        for (let j = 0; j < currentCols; j++) {
-            if (Math.abs(workingMatrix[i][j]) > 0.000001) {
-                allZero = false;
-                break;
-            }
-        }
-
-        if (allZero && Math.abs(workingMatrix[i][currentCols]) > 0.000001) {
-            inconsistent = true;
-            break;
-        }
-
-        if (!allZero) rank++;
-    }
-
-    let solutionType = "";
-
-    if (inconsistent) {
-        solutionType = currentLang === 'ar'
-            ? "لا يوجد حل للنظام"
-            : "No Solution";
-    }
-    else if (rank < currentCols) {
-        solutionType = currentLang === 'ar'
-            ? "يوجد عدد لا نهائي من الحلول"
-            : "Infinite Solutions";
-    }
-    else {
-        solutionType = currentLang === 'ar'
-            ? "يوجد حل وحيد"
-            : "Unique Solution";
-    }
-
-    // Back Substitution only if unique solution
-    const results = new Array(currentCols).fill(0);
-
-    if (!inconsistent && rank === currentCols) {
-
-        for (let i = currentCols - 1; i >= 0; i--) {
-
-            let sum = 0;
-
-            for (let j = i + 1; j < currentCols; j++) {
-                sum += workingMatrix[i][j] * results[j];
-            }
-
-            results[i] =
-                (workingMatrix[i][currentCols] - sum) /
-                workingMatrix[i][i];
-        }
-    }
-
-    renderFinalResults(results, solutionType, !inconsistent && rank === currentCols);
-}
-
-function renderFinalResults(results, solutionType, hasUniqueSolution) {
-
+function renderStep(matrix, title, notation) {
     const container = document.getElementById('steps-container');
+    const stepCard = document.createElement('div');
+    stepCard.className = 'step-card';
+    
+    let dynamicExplanation = currentLang === 'ar' ? 
+        `للتخلص من العنصر في <strong>الصف ${notation.split('=')[0].trim()}</strong>، نضرب <strong>${notation.split(')')[1].trim()}</strong> في <strong>${notation.split('(')[1].split(')')[0]}</strong> ونطرحه.` :
+        `To eliminate the element in <strong>${notation.split('=')[0].trim()}</strong>, we multiply <strong>${notation.split(')')[1].trim()}</strong> by <strong>${notation.split('(')[1].split(')')[0]}</strong> and subtract it.`;
 
-    const resDiv = document.createElement('div');
-
-    resDiv.className = 'step-card';
-
-    resDiv.style.borderTop = "4px solid var(--success)";
-
-    let html = `
-    <div class="step-header">
-        <h3>${translations[currentLang].final_sol}</h3>
-        <div class="badge" style="background:var(--success)">
-            ${solutionType}
-        </div>
-    </div>
-    `;
-
-    if (hasUniqueSolution) {
-
-        html += `
-        <div style="
-            display:flex;
-            gap:15px;
-            flex-wrap:wrap;
-            justify-content:center;
-            padding:20px;
-        ">
-        `;
-
-        results.forEach((val, i) => {
-
-            html += `
-            <div class="btn-main" style="
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                min-width:140px;
-            ">
-                X${i+1} = ${val.toFixed(4)}
-            </div>
-            `;
+    let matrixHTML = '<div class="matrix-wrapper" style="padding:0;">';
+    matrix.forEach((row, i) => {
+        matrixHTML += '<div class="matrix-row">';
+        row.forEach((val, j) => {
+            if (j === currentCols) matrixHTML += '<div class="v-line"></div>';
+            const isZeroed = notation.includes(`R${i+1}`) && Math.abs(val) < 0.0001;
+            const inputClass = isZeroed ? 'pivot-active' : '';
+            matrixHTML += `<input type="text" value="${val.toFixed(2)}" readonly class="${inputClass}" style="width: 65px; height: 40px; text-align: center; margin: 2px;">`;
         });
-
-        html += `</div>`;
-    }
-
-    resDiv.innerHTML = html;
-
-    container.appendChild(resDiv);
-
-    resDiv.scrollIntoView({ behavior: 'smooth' });
-}
+        matrixHTML += '</div>';
+    });
     matrixHTML += '</div>';
 
     stepCard.innerHTML = `
